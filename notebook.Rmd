@@ -1,0 +1,250 @@
+```{r}
+# Display the summary statistics of numerical columns
+
+df <-read.csv("./spaceship-titanic/train.csv")
+summary(df)
+```
+
+```{r}
+head(df)
+```
+
+
+```{r}
+library(ggplot2)
+
+```
+
+
+
+
+
+```{r}
+avg <-aggregate(Age ~ Transported, data = data, FUN = mean)
+print(avg)
+```
+
+```{r}
+# a boxplot of Age based on VIP status
+ggplot(data, aes(x = VIP, y = Age, fill = VIP)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Age based on VIP status", x = "VIP", y = "Age")
+
+```
+The boxplot above shows that the median age of people with VIP status is higher than the median age of people without VIP status. The boxes also show that there is more variability in the age of people with VIP status than in the age of people without VIP status. The whiskers show that there are a few outliers in both groups, but there are more outliers in the group with VIP status.
+
+Here are some specific things you can see in the image:
+
+The median age of people with VIP status is about 40, while the median age of people without VIP status is about 30.
+The boxes for the two groups do not overlap, which means that there is no overlap in the distribution of ages between the two groups.
+The whiskers for the group with VIP status extend further than the whiskers for the group without VIP status, which means that there are more outliers in the group with VIP status
+
+
+
+```{r}
+# Calculate the percentage of transported vs. non-transported passengers
+p<-prop.table(table(data$Transported)) * 100
+print(p)
+```
+
+```{r}
+# Calculate the average age of VIP and non-VIP passengers
+avg2<-aggregate(Age ~ VIP, data = data, FUN = mean)
+print(avg2)
+```
+
+
+```{r}
+
+# Calculate the total shopping mall spending for transported passengers
+total_shopping_spending <- sum(data$ShoppingMall[data$Transported],na.rm = TRUE)
+print(total_shopping_spending)
+```
+
+```{r}
+# Calculate the correlation matrix for numerical variables
+cor_matrix <- cor(data[, c("Age", "RoomService", "FoodCourt", "ShoppingMall", "Spa", "VRDeck")])
+cor_matrix
+```
+
+
+
+```{r}
+# Remove rows with missing values in relevant variables
+data_subset <- na.omit(data[, c("Age", "RoomService", "FoodCourt", "ShoppingMall", "Spa", "VRDeck")])
+
+# Calculate the correlation matrix for numerical variables
+cor_matrix <- cor(data_subset)
+cor_matrix
+
+```
+
+```{r}
+# checking for the records whose age is less than 18 years
+df[df$Age<18,]
+```
+
+
+```{r}
+# checking for the records whose age is more than 50 years
+df[df$Age>50,]
+```
+
+
+```{r}
+# checking for the records whose age is in the 20's
+df[df$Age> 19& df$Age<30,]
+```
+
+
+```{r}
+range(df$Age,na.rm = TRUE)
+```
+
+```{r}
+tbl <- with(df, table(VIP,Age))
+
+barplot(tbl, beside = TRUE, legend = TRUE)
+```
+
+```{r}
+# Assuming df is your data frame
+
+tbl <- with(df, table(VIP, Age))
+
+# Convert the table to a data frame
+tbl_df <- as.data.frame(tbl)
+
+# Use ggplot for more control over the width
+ggplot(tbl_df, aes(x = Age, y = Freq, fill = VIP)) +
+  geom_bar(position = "dodge", stat = "identity", width = 0.8) +
+  labs(title = "Barplot of VIP and Age", x = "Age", y = "Frequency") +
+  theme_minimal()
+
+```
+
+
+```{r}
+# Create a bar plot
+barplot(table(df$CryoSleep), col = c("red", "blue"), legend = TRUE)
+```
+##CryoSleep: 
+Indicates whether the passenger underwent cryogenic sleep (True/False) incomparison to their ages
+
+
+
+```{r}
+# Create a contingency table
+table_home_cryo <- table(df$HomePlanet, df$CryoSleep)
+
+# Display the table
+print(table_home_cryo)
+
+# Create a bar plot
+barplot(table_home_cryo, beside = TRUE, legend = TRUE, col = c("red", "blue"))
+
+```
+
+This bar plot shows the distribution of cryosleep (True/False) for each home planet. 
+The x-axis represents home planets, and the bars will be colored differently based on cryosleep status.
+
+From the observation it seems that their planet of origin did not affect their cryo sleep
+
+
+
+```{r}
+# Create a summary table for amenities by age group
+summary_by_age <- with(df, by(df, Age, FUN = function(x) {
+  data.frame(
+    Mean_RoomService = mean(x$RoomService, na.rm = TRUE),
+    Mean_FoodCourt = mean(x$FoodCourt, na.rm = TRUE),
+    Mean_ShoppingMall = mean(x$ShoppingMall, na.rm = TRUE),
+    Mean_Spa = mean(x$Spa, na.rm = TRUE),
+    Mean_VRDeck = mean(x$VRDeck, na.rm = TRUE)
+  )
+}))
+
+# Combine the results into a data frame
+summary_df <- do.call(rbind, summary_by_age)
+
+# Display the summary table
+print(summary_df)
+
+```
+
+```{r}
+# Create box plots for each amenity by age group
+par(mfrow = c(2, 3))
+boxplot(RoomService ~ Age, data = df, main = "RoomService by Age", col = "lightblue")
+boxplot(FoodCourt ~ Age, data = df, main = "FoodCourt by Age", col = "lightgreen")
+boxplot(ShoppingMall ~ Age, data = df, main = "ShoppingMall by Age", col = "lightcoral")
+boxplot(Spa ~ Age, data = df, main = "Spa by Age", col = "lightyellow")
+boxplot(VRDeck ~ Age, data = df, main = "VRDeck by Age", col = "lightpink")
+
+```
+##General Observations:
+
+Data Distribution: Across all four plots, there seems to be a positive correlation between age and consumption. This means that as people get older, their consumption in these venues tends to increase.
+Variability: The data points appear to be quite scattered, suggesting a fair amount of variability in consumption patterns across different age groups. This variability could be due to various factors like individual preferences, income levels, health conditions, and family situations.
+Outliers: There are a few data points that seem to deviate significantly from the overall trends. These could be outliers caused by individual cases with exceptionally high or low consumption.
+
+##Specific Venues:
+
+Room Service: The data points for Room Service appear to be more concentrated in the lower age range compared to the other venues. This might suggest that younger people are more likely to order room service than older people.
+FoodCourt: The data points for FoodCourt seem to be more spread out across the age range compared to the other venues. This could indicate that food courts are frequented by people of all ages.
+ShoppingMall: The data points for ShoppingMall are similar to those for FoodCourt, with a wider spread across the age range. This suggests that shopping malls are also popular among people of all ages.
+Spa: The data points for Spa are the most concentrated in the higher age range compared to the other venues. This might imply that spa services are more popular among older individuals.
+
+
+
+```{r}
+# Create a summary table for amenities by VIP status
+summary_by_vip <- with(df, by(df, VIP, FUN = function(x) {
+  data.frame(
+    Mean_RoomService = mean(x$RoomService, na.rm = TRUE),
+    Mean_FoodCourt = mean(x$FoodCourt, na.rm = TRUE),
+    Mean_ShoppingMall = mean(x$ShoppingMall, na.rm = TRUE),
+    Mean_Spa = mean(x$Spa, na.rm = TRUE),
+    Mean_VRDeck = mean(x$VRDeck, na.rm = TRUE)
+  )
+}))
+
+# Combine the results into a data frame
+summary_df_vip <- do.call(rbind, summary_by_vip)
+
+# Display the summary table
+print(summary_df_vip)
+
+```
+```{r}
+# Create box plots for each amenity by VIP status
+par(mfrow = c(2, 3))
+boxplot(RoomService ~ VIP, data = df, main = "RoomService by VIP", col = c("lightblue", "lightcoral"))
+boxplot(FoodCourt ~ VIP, data = df, main = "FoodCourt by VIP", col = c("lightgreen", "lightcoral"))
+boxplot(ShoppingMall ~ VIP, data = df, main = "ShoppingMall by VIP", col = c("lightcoral", "lightgreen"))
+boxplot(Spa ~ VIP, data = df, main = "Spa by VIP", col = c("lightyellow", "lightcoral"))
+boxplot(VRDeck ~ VIP, data = df, main = "VRDeck by VIP", col = c("lightpink", "lightcoral"))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
